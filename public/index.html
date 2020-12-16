@@ -1,0 +1,300 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Device Access Sample App</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script type="application/javascript" src="api.js"></script>
+  <script type="application/javascript" src="app.js"></script>
+  <script type="application/javascript" src="auth.js"></script>
+  <script type="application/javascript" src="events.js"></script>
+  <script type="application/javascript" src="logger.js"></script>
+  <script type="application/javascript" src="ui.js"></script>
+  <script type="application/javascript" src="third_party/kjur.min.js"></script>
+</head>
+<body>
+<div class="grid-container">
+
+  <!-- App Header Panel -->
+  <div class="grid-item item-app-header">
+    <h1 style="margin: auto">Device Access - Sample App</h1>
+    <div class="h-help tip">
+      <img src="images/help.png" alt="Help">
+      <span id="tipSampleApp" class="tip-text">
+            Hover over each tip to learn more!
+          </span>
+    </div>
+  </div>
+
+  <!-- Account Linking Panel -->
+  <div class="grid-item item-account-linking">
+    <div class="box-container">
+      <div class="box-header">
+        <h2 id="hdrAccountLinking" class="hdr">Account Linking</h2>
+        <div class="hdr-help tip">
+          <img src="images/1.png" alt="?">
+          <span id="tipAccountLinking" class="tip-text">
+                1 - Account Linking is the first step for Device Access integration.
+                The app will follow <a href="https://developers.google.com/identity/protocols/oauth2">OAuth flow</a>
+                to retrieve user consent.
+                <br><br>
+                Client Id and Client Secret can be obtained from
+                <a href="https://console.cloud.google.com/apis/credentials">Google Cloud Platform</a>.
+                <br><br>
+                Project Id is the identifier of the project created in
+                <a href="https://console.nest.google.com/device-access/project-list">Device Access Console</a>.
+                <br><br>
+                The dropdown controls the target API, which will determine the endpoints
+                used for account linking and execution.
+                <br><br>
+                Completing OAuth flow and correctly signing in will enable the other controls.
+              </span>
+        </div>
+      </div>
+      <div class="box-content">
+        <input id="txtClientId" placeholder="< Client Id >" onkeyup="typeClientId()">
+        <br/><br/>
+        <input id="txtClientSecret" placeholder="< Client Secret >" onkeyup="typeClientSecret()">
+        <br/><br/>
+        <input id="txtProjectId" placeholder="< Project Id >" onkeyup="typeProjectId()">
+        <br/>
+      </div>
+      <div class="box-buttons">
+        <button id="btnSignIn" onclick="clickSignIn();">Sign In</button>
+      </div>
+    </div>
+
+    <!-- Auth Token Panel -->
+    <div class="grid-item item-auth-tokens">
+      <table style="width:100%; text-align: center;">
+        <tr>
+          <td style="width:33%;"><img id="imgOAuthCode" src="images/empty.png" alt="Pending..." width="48" height="48"></td>
+          <td style="width:34%;"><img id="imgAccessToken" src="images/empty.png" alt="Pending..." width="48" height="48"></td>
+          <td style="width:33%;"><img id="imgRefreshToken" src="images/empty.png" alt="Pending..." width="48" height="48"></td>
+        </tr>
+        <tr>
+          <td id="hdrOAuthCode">OAuth Code</td>
+          <td id="hdrAccessToken">Access Token</td>
+          <td id="hdrRefreshToken">Refresh Token</td>
+        </tr>
+        <tr>
+          <td><button id="btnViewOAuthCode" onclick="clickViewOAuthCode();" style="margin-top: 5px;">View</button></td>
+          <td><button id="btnViewAccessToken" onclick="clickViewAccessToken();" style="margin-top: 5px;">View</button></td>
+          <td><button id="btnViewRefreshToken" onclick="clickViewRefreshToken();" style="margin-top: 5px;">View</button></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Device Access Panel -->
+  <div class="grid-item item-device-access">
+    <div class="box-container">
+      <div class="box-header">
+        <h2 id="hdrDeviceAccess" class="hdr">Device Access</h2>
+        <div class="hdr-help tip">
+          <img src="images/2.png" alt="?">
+          <span id="tipDeviceAccess" class="tip-text">
+                2 - Device Access panel provides controls for subscribing to events,
+                accessing Resource Picker, as well as calling
+                <a href="https://developers.google.com/nest/device-access/reference/rest/v1/enterprises.devices/list">
+                  ListDevices</a> and
+                <a href="https://developers.google.com/nest/device-access/reference/rest/v1/enterprises.structures/list">
+                  ListStructures</a> methods.
+                <br><br>
+                Each time the page page is refreshed, the app will issue a ListDevices automatically.
+              </span>
+        </div>
+      </div>
+      <div class="box-buttons">
+        <button id="btnListDevices" onclick="clickListDevices();" style="margin-right: 10px;">List Devices</button>
+        <button id="btnListStructures" onclick="clickListStructures();" style="margin-right: 10px;">List Structures</button>
+        <button id="btnResourcePicker" onclick="clickResourcePicker();">Resource Picker</button>
+      </div>
+    </div>
+
+    <!-- Device Events Panel -->
+    <div class="grid-item item-device-events">
+      <div class="box-container">
+        <div class="box-header">
+          <h2 id="hdrDeviceEvents" class="hdr">Device Events</h2>
+          <div class="hdr-help tip">
+            <img src="images/3.png" alt="?">
+            <span id="tipDeviceEvents" class="tip-text">
+                  3 - Events (Optional) allow you to receive asynchronous activity associated with
+                  target devices. To subscribe to events, you need to provide a
+                  <a href="https://cloud.google.com/iam/docs/creating-managing-service-account-keys">Service Account Key</a>
+                  and a <a href="https://cloud.google.com/pubsub/docs/admin">Subscription Id</a>.
+                  <br><br>
+                  Your Service Account Key is used locally to sign the pub-sub requests. It does not leave the browser.
+            </span>
+          </div>
+        </div>
+        <div class="box-content">
+          <input id="txtSubscriptionId" type="string" placeholder="< Subscription Id >" onkeyup="typeSubscriptionId()">
+          <br/><br/>
+          <textarea id="txtServiceAccountKey" placeholder="< Service Account Key >" onkeyup="typeServiceAccountKey()"
+                    rows="6"></textarea>
+          <br/><br/>
+          <div>
+            <button id="btnSubscribe" onclick="clickSubscribe();" style="margin-right: 6px;">Subscribe</button>
+            <button id="btnGetEvents" onclick="clickGetEvents();">Get Events</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Control Panel -->
+  <div class="grid-item item-device-control">
+    <div class="box-container">
+      <div id="deviceControlDiv" class="box-header">
+        <h2 id="hdrDeviceControl" class="hdr">Device Control</h2>
+        <div class="hdr-help tip">
+          <img src="images/4.png" alt="?">
+          <span id="tipDeviceControl" class="tip-text">
+                4 - Device Control panel provides controls for devices linked to the user.
+                You can chose the device from the dropdown.
+                <br><br>
+                Currently devices supported are Nest
+                <a href="https://developers.google.com/nest/device-access/api/thermostat">Thermostat</a>,
+                <a href="https://developers.google.com/nest/device-access/api/camera">Camera</a> and
+                <a href="https://developers.google.com/nest/device-access/api/doorbell">Doorbell</a>.
+              </span>
+        </div>
+      </div>
+      <div class="box-content">
+        <!-- Device Selector -->
+        <select id="sctDeviceList" onchange="selectDevice()">
+          <option value="" disabled selected hidden>&lt No Devices &gt</option>
+        </select>
+        <br>
+        <br>
+        <!-- Thermostat Control -->
+        <div id="thermostat-control" class="thermostat-control" hidden>
+          <img id="imgThermostat" src="images/thermostat.png" alt="Thermostat" width="96" height="96">
+          <br>
+          <br>
+          <table style="margin: auto;">
+            <td style="width: 125px; vertical-align: top; text-align: center">
+              <button id="btnFanMode" onclick="clickFanMode();">Activate Fan</button>
+              <br><br>
+              <select id="sctThermostatMode" style="height: 27px; width: 98px;">
+                <option value="OFF">Off</option>
+                <option value="HEAT">Heat</option>
+                <option value="COOL">Cool</option>
+                <option value="HEATCOOL">HeatCool</option>
+              </select>
+              <br><br>
+              <button id="btnThermostatMode" onclick="clickThermostatMode();">Change Mode</button>
+            </td>
+            <td style="text-align: center">
+              <div id="heatDiv">
+                <input id="txtHeatTemperature" class="text-temp" placeholder="< Heat >">
+                <div id="heatUnit" class="text-unit">°C</div>
+              </div>
+              <br>
+              <div id="coolDiv">
+                <input id="txtCoolTemperature" class="text-temp" placeholder="< Cool >">
+                <div id="coolUnit" class="text-unit">°C</div>
+              </div>
+              <br>
+              <button id="btnTemperatureSetpoint" onclick="clickTemperatureSetpoint();">Set Temperature</button>
+            </td>
+          </table>
+        </div>
+        <!-- Camera Control -->
+        <div id="camera-control" class="camera-control" hidden>
+          <img id="imgCamera" src="images/camera.png" alt="Camera" width="96" height="96">
+          <br>
+          <br>
+          <table style="margin: auto;">
+            <td style="width: 125px;">
+              <button onclick="clickGenerateStream();">Camera Stream</button>
+              <br><br>
+              <button onclick="clickExtendStream();">Refresh Stream</button>
+              <br><br>
+              <button onclick="clickStopStream();">Stop Stream</button>
+            </td>
+            <td>
+              <textarea id="txtExtensionToken1" class="text-area" placeholder="< Extension Token >"  rows="8" readonly></textarea>
+            </td>
+          </table>
+        </div>
+        <!-- Doorbell Control -->
+        <div id="doorbell-control" class="camera-control" hidden>
+          <img id="imgDoorbell" src="images/doorbell.png" alt="Doorbell" width="96" height="96">
+          <br>
+          <br>
+          <table style="margin: auto;">
+            <td style="width: 125px;">
+              <button onclick="clickGenerateStream();">Camera Stream</button>
+              <br><br>
+              <button onclick="clickExtendStream();">Refresh Stream</button>
+              <br><br>
+              <button onclick="clickStopStream();">Stop Stream</button>
+            </td>
+            <td>
+              <div style="text-align: center;">Extension Token</div>
+              <br>
+              <textarea id="txtExtensionToken2" class="text-area" placeholder="< Extension Token >"  rows="8" readonly></textarea>
+            </td>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logs Panel -->
+  <div class="grid-item item-log-list">
+    <div class="box-container">
+      <div class="box-header">
+        <h2 id="hdrApplicationLogs" class="hdr">Application Logs</h2>
+        <div class="hdr-help tip">
+          <img src="images/5.png" alt="?">
+          <span id="tipApplicationLogs" class="tip-text">
+                5 - Application Logs provide logs for each interaction captured by this application.
+                <br><br>
+                Logs are categorized into three groups: actions happened within the app,
+                HTTP requests and pub-sub events.
+              </span>
+        </div>
+      </div>
+      <div class="box-content">
+        <div id="log-filters" class="log-filters">
+          <button id="btnFilterAction" class="button-filter filter-action" onclick="onFilterAction();">Action</button>
+          <button id="btnFilterHTTP" class="button-filter filter-http" onclick="onFilterHTTP();">HTTP</button>
+          <button id="btnFilterEvent" class="button-filter filter-event" onclick="onFilterEvent();">Event</button>
+        </div>
+        <div id="log-container" class="log-container">
+          <!-- Log entries are generated dynamically from the template... -->
+        </div>
+      </div>
+      <div class="box-buttons">
+        <button onclick="clickClearLogs();">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log Descriptions Panel -->
+  <div class="grid-item item-log-description">
+    <div id="log-header" class="log-header">
+      <h3 id="log-title" class="log-title"></h3>
+      <div id="empty-space"></div>
+      <h5 id="log-time" class="log-time"></h5>
+      <h5 id="log-type" class="log-type"></h5>
+    </div>
+    <div id="log-text" class="log-text">
+    </div>
+  </div>
+</div>
+</body>
+
+<!-- Log Entry Template -->
+<template>
+  <div class="log-entry"></div>
+</template>
+
+<!-- Initializing JavaScript -->
+<script type="application/javascript">
+  init();
+</script>
+</html>
