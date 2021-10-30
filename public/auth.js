@@ -16,12 +16,13 @@ limitations under the License.
 
 
 // Server Credentials:
-const PROD_API = "https://smartdevicemanagement.googleapis.com/v1";
-const PROD_ENDPOINT = "https://nestservices.google.com/partnerconnections/";
-const PROD_RESOURCE_PICKER = "https://sdmresourcepicker.sandbox.google.com/";
-
 const TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
 const OAUTH_SCOPE = "https://www.googleapis.com/auth/sdm.service";
+
+// Configuration Variables:
+let selectedAPI = "https://smartdevicemanagement.googleapis.com/v1";
+let selectedEndpoint = "https://nestservices.google.com/partnerconnections/";
+let selectedResourcePicker = "https://sdmresourcepicker.sandbox.google.com/";
 
 // Partner Credentials:
 let clientId = "";
@@ -40,7 +41,7 @@ function signIn() {
   let redirectURI = window.location.origin + '/auth';
    
   // Google's OAuth 2.0 endpoint for requesting an access token
-  let oauthEndpoint = PROD_ENDPOINT + projectId + "/auth";
+  let oauthEndpoint = selectedEndpoint + projectId + "/auth";
 
   // Create <form> element to submit parameters to OAuth 2.0 endpoint.
   let form = document.createElement('form');
@@ -187,6 +188,7 @@ function exchangeCode() {
     pushLog(LogType.HTTP, "POST Request", requestEndpoint + "\n\n" + requestPayload);
 
     // Send Http request:
+    pushLog(LogType.HTTP, "POST Request", JSON.stringify(payload, null, 4));
     xhr.send(JSON.stringify(payload));
   });
 }

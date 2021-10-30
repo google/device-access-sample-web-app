@@ -11,7 +11,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.\
+limitations under the License.
 */
 
 
@@ -99,10 +99,12 @@ function initializeDevices() {
 
 /** Device Object Model */
 class Device {
-  constructor(id, type, name) {
+  constructor(id, type, name, structure, traits) {
     this.id = id;
     this.type = type;
     this.name = name;
+    this.structure = structure;
+    this.traits = traits;
   }
 }
 

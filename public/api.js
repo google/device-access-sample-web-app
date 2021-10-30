@@ -22,7 +22,7 @@ let streamExtensionToken = "";
 /** deviceAccessRequest - Issues requests to Device Access Rest API */
 function deviceAccessRequest(method, call, localpath, payload = "") {
   let xhr = new XMLHttpRequest();
-  xhr.open(method, PROD_API + localpath);
+  xhr.open(method, selectedAPI + localpath);
   xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
   xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
@@ -36,7 +36,7 @@ function deviceAccessRequest(method, call, localpath, payload = "") {
     }
   };
 
-  let requestEndpoint = "* Endpoint: \n" + PROD_API + localpath;
+  let requestEndpoint = "* Endpoint: \n" + selectedAPI + localpath;
   let requestAuthorization = "* Authorization: \n" + 'Bearer ' + accessToken;
   let requestPayload = "* Payload: \n" + JSON.stringify(payload, null, 4);
   pushLog(LogType.HTTP, method + " Request",
@@ -49,8 +49,10 @@ function deviceAccessRequest(method, call, localpath, payload = "") {
   }
 }
 
+
 /** deviceAccessResponse - Parses responses from Device Access API calls */
 function deviceAccessResponse(method, call, response) {
+  pushLog(LogType.HTTP, method + " Response", response);
   let data = JSON.parse(response);
   // Check if response data is empty:
   if(!data) {
@@ -78,6 +80,11 @@ function deviceAccessResponse(method, call, response) {
         let scannedType = data.devices[i].type;
         let startIndexType = scannedType.lastIndexOf('.');
         let deviceType = scannedType.substring(startIndexType + 1);
+        // Parse Device Structure:
+        let scannedAssignee = data.devices[i].assignee;
+        let startIndexStructure = scannedAssignee.lastIndexOf('/structures/');
+        let endIndexStructure = scannedAssignee.lastIndexOf('/rooms/');
+        let deviceStructure = scannedAssignee.substring(startIndexStructure + 12, endIndexStructure);
 
         // Handle special case for Displays (Skip, no support!)
         if(deviceType === "DISPLAY")
@@ -101,21 +108,43 @@ function deviceAccessResponse(method, call, response) {
         let scannedRoom = scannedRelations[0]["displayName"];
         // Parse Device Name:
         let deviceName = scannedName !== "" ? scannedName : scannedRoom + " " + stringFormat(deviceType);
+        // Parse Device Traits:
+        let deviceTraits = Object.keys(data.devices[i].traits);
 
-        addDevice(new Device(deviceId, deviceType, deviceName));
+        // WebRTC check:
+        let traitCameraLiveStream = data.devices[i].traits["sdm.devices.traits.CameraLiveStream"];
+
+        if(traitCameraLiveStream) {
+          let supportedProtocols = traitCameraLiveStream.supportedProtocols;
+          if (supportedProtocols && supportedProtocols.includes("WEB_RTC")) {
+            deviceType += "-webrtc";
+            initializeWebRTC();
+          }
+        }
+
+        addDevice(new Device(deviceId, deviceType, deviceName, deviceStructure, deviceTraits));
       }
       break;
     case 'listStructures':
+      console.log("List Structures!");
       break;
     case 'generateStream':
+      console.log("Generate Stream!");
       if(data["results"] && data["results"].hasOwnProperty("streamExtensionToken"))
         updateStreamExtensionToken(data["results"].streamExtensionToken);
+      if(data["results"] && data["results"].hasOwnProperty("answerSdp")) {
+        updateWebRTC(data["results"].answerSdp);
+        pushLog(LogType.ACTION, "[Video Stream]", "");
+      }
       break;
     case 'refreshStream':
+      console.log("Refresh Stream!");
       if(data["results"] && data["results"].hasOwnProperty("streamExtensionToken"))
         updateStreamExtensionToken(data["results"].streamExtensionToken);
       break;
     case 'stopStream':
+      console.log("Stop Stream!");
+      initializeWebRTC();
       break;
     case 'fanMode':
       if(document.getElementById("btnFanMode").textContent === "Activate Fan")
@@ -124,8 +153,10 @@ function deviceAccessResponse(method, call, response) {
         document.getElementById("btnFanMode").textContent = "Activate Fan";
       break;
     case 'thermostatMode':
+      console.log("Thermostat Mode!");
       break;
     case 'temperatureSetpoint':
+      console.log("Temperature Setpoint!");
       break;
     default:
       pushError(LogType.ACTION, "Error", "Unrecognized Request Call!");
@@ -134,8 +165,9 @@ function deviceAccessResponse(method, call, response) {
 
 /** openResourcePicker - Opens Resource Picker on a new browser tab */
 function openResourcePicker() {
-  window.open(PROD_RESOURCE_PICKER);
+  window.open(selectedResourcePicker);
 }
+
 
 
 /// Device Access API ///
@@ -257,6 +289,43 @@ function onStopStream() {
     "command": "sdm.devices.commands.CameraLiveStream.StopRtspStream",
     "params": {
       "streamExtensionToken" : streamExtensionToken
+    }
+  };
+  deviceAccessRequest('POST', 'stopStream', endpoint, payload);
+}
+
+/** onGenerateStream_WebRTC - Issues a GenerateWebRtcStream request */
+function onGenerateStream_WebRTC() {
+  let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
+  let payload = {
+    "command": "sdm.devices.commands.CameraLiveStream.GenerateWebRtcStream",
+    "params": {
+      "offer_sdp": offerSDP
+    }
+  };
+
+  deviceAccessRequest('POST', 'generateStream', endpoint, payload);
+}
+
+/** onExtendStream_WebRTC - Issues a ExtendWebRtcStream request */
+function onExtendStream_WebRTC() {
+  let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
+  let payload = {
+    "command": "sdm.devices.commands.CameraLiveStream.ExtendWebRtcStream",
+    "params": {
+      "mediaSessionId" : streamExtensionToken
+    }
+  };
+  deviceAccessRequest('POST', 'refreshStream', endpoint, payload);
+}
+
+/** onStopStream_WebRTC - Issues a StopWebRtcStream request */
+function onStopStream_WebRTC() {
+  let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
+  let payload = {
+    "command": "sdm.devices.commands.CameraLiveStream.StopWebRtcStream",
+    "params": {
+      "mediaSessionId" : streamExtensionToken
     }
   };
   deviceAccessRequest('POST', 'stopStream', endpoint, payload);

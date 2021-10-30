@@ -38,7 +38,6 @@ function eventChecker() {
 
 /** pubsubEvents - Pubsub controller function (first gets an Access Token, then issues a pubsub pull) */
 function pubsubEvents() {
-
   let parsedKey;
 
   try {
@@ -178,7 +177,7 @@ function postRequest(endpoint, payload, callback, token = null) {
 
 /** buildSubscriptionUrl - Function to issue a pubsub ack request */
 function buildSubscriptionUrl() {
-  if(subscriptionId.includes("projects/") || subscriptionId.includes("subscriptions/")) {
+  if (subscriptionId.includes("projects/") || subscriptionId.includes("subscriptions/")) {
     let startSubscriptionId = subscriptionId.lastIndexOf('/');
     subscriptionId = subscriptionId.substring(startSubscriptionId + 1);
     updateSubscriptionId(subscriptionId);

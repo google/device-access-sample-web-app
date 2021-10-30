@@ -217,6 +217,16 @@ body {
   word-break: break-all;
 }
 
+.log-video {
+  font-family: monospace, sans-serif;
+  color: #444444;
+  margin: 40px 40px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  display: flex;
+}
+
 .text-temp {
   height: 27px;
   width: 75%;

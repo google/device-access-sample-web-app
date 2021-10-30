@@ -9,6 +9,7 @@
   <script type="application/javascript" src="events.js"></script>
   <script type="application/javascript" src="logger.js"></script>
   <script type="application/javascript" src="ui.js"></script>
+  <script type="application/javascript" src="webrtc.js"></script>
   <script type="application/javascript" src="third_party/kjur.min.js"></script>
 </head>
 <body>
@@ -56,7 +57,6 @@
         <input id="txtClientSecret" placeholder="< Client Secret >" onkeyup="typeClientSecret()">
         <br/><br/>
         <input id="txtProjectId" placeholder="< Project Id >" onkeyup="typeProjectId()">
-        <br/>
       </div>
       <div class="box-buttons">
         <button id="btnSignIn" onclick="clickSignIn();">Sign In</button>
@@ -239,6 +239,46 @@
             </td>
           </table>
         </div>
+        <!-- Camera Control (WebRTC) -->
+        <div id="camera-webrtc-control" class="camera-control" hidden>
+          <img id="imgCameraWebRTC" src="images/camera-webrtc.png" alt="Camera" width="96" height="96">
+          <br>
+          <br>
+          <table style="margin: auto;">
+            <td style="width: 125px;">
+              <button onclick="clickGenerateStream_WebRTC();">Camera Stream</button>
+              <br><br>
+              <button onclick="clickExtendStream_WebRTC();">Refresh Stream</button>
+              <br><br>
+              <button onclick="clickStopStream_WebRTC();">Stop Stream</button>
+            </td>
+            <td>
+              <textarea id="txtExtensionToken3"  class="text-area" style="height: 28px;" placeholder="< Media Session ID >"  rows="2" readonly></textarea>
+              <br><br>
+              <textarea id="txtOfferSDPCamera" style="width: 100%; height: 28px;" placeholder="< Offer SDP >"  rows="1" readonly></textarea>
+            </td>
+          </table>
+        </div>
+        <!-- Doorbell Control (WebRTC) -->
+        <div id="doorbell-webrtc-control" class="camera-control" hidden>
+          <img id="imgDoorbellWebRTC" src="images/doorbell-webrtc.png" alt="Doorbell" width="96" height="96">
+          <br>
+          <br>
+          <table style="margin: auto;">
+            <td style="width: 125px;">
+              <button onclick="clickGenerateStream_WebRTC();">Camera Stream</button>
+              <br><br>
+              <button onclick="clickExtendStream_WebRTC();">Refresh Stream</button>
+              <br><br>
+              <button onclick="clickStopStream_WebRTC();">Stop Stream</button>
+            </td>
+            <td>
+              <textarea id="txtExtensionToken4" class="text-area" style="height: 28px;" placeholder="< Media Session ID >"  rows="2" readonly></textarea>
+              <br><br>
+              <textarea id="txtOfferSDPDoorbell" style="width: 100%; height: 28px;" placeholder="< Offer SDP >" rows="1" readonly></textarea>
+            </td>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -283,6 +323,9 @@
       <h5 id="log-type" class="log-type"></h5>
     </div>
     <div id="log-text" class="log-text">
+    </div>
+    <div id="log-video" class="log-video" hidden>
+      <video id="video-stream" autoplay playsinline hidden></video>
     </div>
   </div>
 </div>

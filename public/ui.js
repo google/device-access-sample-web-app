@@ -106,6 +106,21 @@ function clickStopStream() {
   onStopStream();
 }
 
+function clickGenerateStream_WebRTC() {
+  pushLog(LogType.ACTION, "Camera Stream", "Initiating Camera Stream (WebRTC) call to Device Access API");
+  onGenerateStream_WebRTC();
+}
+
+function clickExtendStream_WebRTC() {
+  pushLog(LogType.ACTION, "Refresh Stream", "Initiating Refresh Camera Stream call to Device Access API");
+  onExtendStream_WebRTC();
+}
+
+function clickStopStream_WebRTC() {
+  pushLog(LogType.ACTION, "Stop Stream", "Initiating Stop Camera Stream call to Device Access API");
+  onStopStream_WebRTC();
+}
+
 /** clickClearLogs - Clears the list of logs, and the selected log */
 function clickClearLogs() {
   document.getElementById("log-container").innerHTML = '';
@@ -182,10 +197,18 @@ function updateServiceAccountKey(value) {
   document.getElementById("txtServiceAccountKey").value = serviceAccountKey;
 }
 
+function updateOfferSDP(value) {
+  offerSDP = value;
+  document.getElementById("txtOfferSDPCamera").value = offerSDP;
+  document.getElementById("txtOfferSDPDoorbell").value = offerSDP;
+}
+
 function updateStreamExtensionToken(value) {
   streamExtensionToken = value;
   document.getElementById("txtExtensionToken1").value = streamExtensionToken;
   document.getElementById("txtExtensionToken2").value = streamExtensionToken;
+  document.getElementById("txtExtensionToken3").value = streamExtensionToken;
+  document.getElementById("txtExtensionToken4").value = streamExtensionToken;
 }
 
 function updateOAuthCode(value) {
@@ -380,7 +403,10 @@ function hideDeviceControls() {
   document.getElementById("thermostat-control").setAttribute("hidden", true);
   document.getElementById("camera-control").setAttribute("hidden", true);
   document.getElementById("doorbell-control").setAttribute("hidden", true);
+  document.getElementById("camera-webrtc-control").setAttribute("hidden", true);
+  document.getElementById("doorbell-webrtc-control").setAttribute("hidden", true);
 }
+
 
 
 /// Logging Functions ///
@@ -419,8 +445,12 @@ function showLogEntry(index){
   }
 
   if(logTitle.textContent.includes("Video Stream")) {
+    document.getElementById("log-video").removeAttribute("style");
+    document.getElementById("video-stream").removeAttribute("hidden");
     document.getElementById("log-text").setAttribute("hidden", "");
   } else {
+    document.getElementById("log-video").setAttribute("style", "display: none;");
+    document.getElementById("video-stream").setAttribute("hidden", "");
     document.getElementById("log-text").removeAttribute("hidden");
   }
 }
