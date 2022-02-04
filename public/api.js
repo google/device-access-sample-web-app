@@ -300,7 +300,7 @@ function onGenerateStream_WebRTC() {
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.GenerateWebRtcStream",
     "params": {
-      "offer_sdp": offerSDP
+      "offerSdp": offerSDP
     }
   };
 
