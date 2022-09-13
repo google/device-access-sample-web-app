@@ -130,8 +130,8 @@ function deviceAccessResponse(method, call, response) {
       break;
     case 'generateStream':
       console.log("Generate Stream!");
-      if(data["results"] && data["results"].hasOwnProperty("streamExtensionToken"))
-        updateStreamExtensionToken(data["results"].streamExtensionToken);
+      if(data["results"] && (data["results"].hasOwnProperty("streamExtensionToken") || data["results"].hasOwnProperty("mediaSessionId")))
+        updateStreamExtensionToken(data["results"].streamExtensionToken || data["results"].mediaSessionId);
       if(data["results"] && data["results"].hasOwnProperty("answerSdp")) {
         updateWebRTC(data["results"].answerSdp);
         pushLog(LogType.ACTION, "[Video Stream]", "");
@@ -139,8 +139,8 @@ function deviceAccessResponse(method, call, response) {
       break;
     case 'refreshStream':
       console.log("Refresh Stream!");
-      if(data["results"] && data["results"].hasOwnProperty("streamExtensionToken"))
-        updateStreamExtensionToken(data["results"].streamExtensionToken);
+      if(data["results"] && (data["results"].hasOwnProperty("streamExtensionToken") || data["results"].hasOwnProperty("mediaSessionId")))
+        updateStreamExtensionToken(data["results"].streamExtensionToken || data["results"].mediaSessionId);
       break;
     case 'stopStream':
       console.log("Stop Stream!");
