@@ -1,5 +1,5 @@
 
-/* Copyright 2020 Google LLC
+/* Copyright 2022 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ let localStream;
 let remoteStream;
 let offerSDP = "";
 let initialized = false;
+let videoElement;
 
 
 // WebRTC Configurations:
@@ -37,7 +38,30 @@ const mediaStreamConstraints = {
   video: false,
 };
 
+// WebRTC Analytics:
 
+// Page launch
+let timestampInitializeWebRTC;
+let timestampStartLocalStream;
+let timestampCreateSdpOffer;
+let timestampCreateSdpOfferSuccess;
+let timestampSetLocalDescription;
+let timestampSetLocalDescriptionSuccess;
+
+// Camera Stream button pressed
+let timestampGenerateStreamRequest;
+let timestampGenerateWebRtcStreamRequest; // senderSdpOffer
+let timestampGenerateStreamResponse; // sendSdpOffer success / timestampSdpAnswerReceived
+let timestampExtendStreamRequest;
+let timestampExtendWebRtcStreamRequest;
+let timestampExtendStreamResponse;
+let timestampStopStreamRequest;
+let timestampStopWebRtcStreamRequest;
+let timestampStopStreamResponse;
+let timestampSetRemoteDescription;
+let timestampSetRemoteDescriptionSuccess;
+let timestampConnected;
+let timestampPlaybackStarted;
 
 /// WebRTC Functions ///
 
@@ -45,14 +69,26 @@ const mediaStreamConstraints = {
 function initializeWebRTC() {
   if(initialized===true)
     return;
-  console.log(`initializeWebRTC()`);
+  timestampInitializeWebRTC = new Date();
+  updateAnalytics();
+  console.log(`initializeWebRTC() - `, timestampInitializeWebRTC);
+
+  videoElement = document.getElementById('video-stream');
+  videoElement.addEventListener('play', (event) => {
+    timestampPlaybackStarted = new Date();
+    updateAnalytics();
+    console.log('playback started - ', timestampPlaybackStarted);
+  });
+
   initialized = true;
   startLocalStream();
 }
 
 /** startLocalStream - Starts a WebRTC stream on the browser */
 function startLocalStream(mediaStream) {
-  console.log(`startLocalStream()`);
+  timestampStartLocalStream = new Date();
+  updateAnalytics();
+  console.log(`startLocalStream() - `, timestampStartLocalStream);
   localPeerConnection = null;
   localSendChannel = null;
   localStream = null;
@@ -77,15 +113,22 @@ function startLocalStream(mediaStream) {
 
   localPeerConnection.addEventListener('track', gotRemoteMediaTrack);
 
-  console.log('localPeerConnection createOffer start.');
+  timestampCreateSdpOffer = new Date();
+  updateAnalytics();
+  console.log('localPeerConnection createOffer start - ', timestampCreateSdpOffer);
   localPeerConnection.createOffer(localOfferOptions)
       .then(createdOffer).catch(setSessionDescriptionError);
 }
 
 /** createdOffer - Handles local offerSDP creation */
 function createdOffer(description) {
-  console.log(`createdOffer()`);
+  timestampCreateSdpOfferSuccess = new Date();
+  updateAnalytics();
+  console.log(`createdOffer() - `, timestampCreateSdpOfferSuccess);
   updateOfferSDP(description.sdp);
+  timestampSetLocalDescription = new Date();
+  updateAnalytics();
+  console.log(`setLocalDescription() - `, timestampSetLocalDescription);
   localPeerConnection.setLocalDescription(description)
       .then(() => {
         setLocalDescriptionSuccess(localPeerConnection);
@@ -94,11 +137,14 @@ function createdOffer(description) {
 
 /** updateWebRTC - Updates WebRTC connection on receiving answerSDP */
 function updateWebRTC(answerSDP) {
-  console.log(`Answer from remotePeerConnection:\n${answerSDP}.`);
+  console.log(`Answer from remotePeerConnection:\n${answerSDP} - `);
   if (answerSDP[answerSDP.length - 1] !== '\n') {
     answerSDP += '\n';
   }
 
+  timestampSetRemoteDescription = new Date();
+  updateAnalytics();
+  console.log(`setRemoteDescription() - `, timestampSetRemoteDescription);
   localPeerConnection.setRemoteDescription({ "type": "answer", "sdp": answerSDP })
       .then(() => {
         setRemoteDescriptionSuccess(localPeerConnection);
@@ -135,18 +181,22 @@ const receiveChannelCallback = (event) => {
 function setDescriptionSuccess(peerConnection, functionName) {
   console.log(`setDescriptionSuccess()`);
   const peerName = getPeerName(peerConnection);
-  console.log(`${peerName} ${functionName} complete.`);
+  console.log(`${peerName} ${functionName} complete`);
 }
 
 /** setLocalDescriptionSuccess - Handles received local success description */
 function setLocalDescriptionSuccess(peerConnection) {
-  console.log(`setLocalDescriptionSuccess()`);
+  timestampSetLocalDescriptionSuccess = new Date();
+  updateAnalytics();
+  console.log(`setLocalDescriptionSuccess() - `, timestampSetLocalDescriptionSuccess);
   setDescriptionSuccess(peerConnection, 'setLocalDescription');
 }
 
 /** setRemoteDescriptionSuccess - Handles received remote success description */
 function setRemoteDescriptionSuccess(peerConnection) {
-  console.log(`setRemoteDescriptionSuccess()`);
+  timestampSetRemoteDescriptionSuccess = new Date();
+  updateAnalytics();
+  console.log(`setRemoteDescriptionSuccess() - `, timestampSetRemoteDescriptionSuccess);
   setDescriptionSuccess(peerConnection, 'setRemoteDescription');
 }
 
@@ -168,4 +218,43 @@ const handleReceiveMessage = (event) => {
 /** handleConnectionChange - Handles connection change */
 function handleConnectionChange(event) {
   console.log('ICE state change event: ', event);
+  if (event != null && event.currentTarget != null && event.target.iceConnectionState == "connected") {
+    if (timestampConnected == undefined) {
+      timestampConnected = new Date();
+      console.log(`connected - `, timestampConnected);
+      updateAnalytics();
+    }
+  }
+}
+
+/** clearAnalytics - Clear analytics timestamps */
+function clearAnalytics(cameraAnalyticsOnly = false) {
+  console.log('Clearing analytics');
+
+  if (!cameraAnalyticsOnly) {
+    // Page launch
+    timestampInitializeWebRTC = undefined;
+    timestampStartLocalStream = undefined;
+    timestampCreateSdpOffer = undefined;
+    timestampCreateSdpOfferSuccess = undefined;
+    timestampSetLocalDescription = undefined;
+    timestampSetLocalDescriptionSuccess = undefined;
+  }
+
+  // Camera Stream button pressed
+  timestampGenerateStreamRequest = undefined;
+  timestampGenerateWebRtcStreamRequest = undefined;
+  timestampGenerateStreamResponse = undefined;
+  timestampExtendStreamRequest = undefined;
+  timestampExtendWebRtcStreamRequest = undefined;
+  timestampExtendStreamResponse = undefined;
+  timestampStopStreamRequest = undefined;
+  timestampStopWebRtcStreamRequest = undefined;
+  timestampStopStreamResponse = undefined;
+  timestampSetRemoteDescription = undefined;
+  timestampSetRemoteDescriptionSuccess = undefined;
+  timestampConnected = undefined;
+  timestampPlaybackStarted = undefined;
+
+  updateAnalytics();
 }

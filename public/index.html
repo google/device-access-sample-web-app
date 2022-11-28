@@ -283,6 +283,65 @@
     </div>
   </div>
 
+  <!-- Analytics Panel -->
+  <div class="grid-item item-analytics">
+    <div class="box-container">
+      <div class="box-header">
+        <h2 id="hdrAnalytics" class="hdr">Analytics</h2>
+      </div>
+      <table id="analyticsTable">
+        <tr>
+          <td>
+            <div class="analytics-row-label">
+              <p>Initialize WebRTC =><br>
+                setLocalDescription</p>
+            </div>
+          </td>
+          <td>
+            <div class="analytics-row-label">
+              <p>Send SDP Offer =><br>
+                Receive SDP Answer</p>
+            </div>
+          </td>
+          <td>
+            <div class="analytics-row-label">
+              <p>Receive SDP Answer =><br>
+                Connected</p>
+            </div>
+          </td>
+          <td>
+            <div class="analytics-row-label">
+              <p>Connected =><br>
+                Playback started</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="analytics-row-value">
+              <p id="analyticsInitialized">-</p>
+            </div>
+          </td>
+          <td>
+            <div class="analytics-row-value">
+              <p id="analyticsAnswerReceived">-</p>
+            </div>
+          </td>
+          <td>
+            <div class="analytics-row-value">
+              <p id="analyticsConnected">-</p>
+            </div>
+          </td>
+          <td>
+            <div class="analytics-row-value">
+              <p id="analyticsPlaybackStarted">-</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
   <!-- Application Logs Panel -->
   <div class="grid-item item-log-list">
     <div class="box-container">

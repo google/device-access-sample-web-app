@@ -1,5 +1,5 @@
 
-/* Copyright 2020 Google LLC
+/* Copyright 2022 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ const OAUTH_SCOPE = "https://www.googleapis.com/auth/sdm.service";
 // Configuration Variables:
 let selectedAPI = "https://smartdevicemanagement.googleapis.com/v1";
 let selectedEndpoint = "https://nestservices.google.com/partnerconnections/";
-let selectedResourcePicker = "https://sdmresourcepicker.sandbox.google.com/";
+let selectedResourcePicker = "https://nestservices.google.com/partnerconnections";
 
 // Partner Credentials:
 let clientId = "";
@@ -39,7 +39,7 @@ let refreshToken = "";
 function signIn() {
   // Calculating the redirect URI for current window
   let redirectURI = window.location.origin + '/auth';
-   
+
   // Google's OAuth 2.0 endpoint for requesting an access token
   let oauthEndpoint = selectedEndpoint + projectId + "/auth";
 

@@ -1,5 +1,5 @@
 
-/* Copyright 2020 Google LLC
+/* Copyright 2022 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ function clickSignIn() {
   if (isSignedIn) {
     pushLog(LogType.ACTION, "Sign Out", "Signing out.");
     signOut();
-  } else { 
+  } else {
     pushLog(LogType.ACTION, "Sign In", "Signing in.");
     signIn();
   }
@@ -214,7 +214,7 @@ function updateStreamExtensionToken(value) {
 function updateOAuthCode(value) {
   oauthCode = value;
   localStorage["oauthCode"] = oauthCode;
-  
+
   if(value === "") {
     document.getElementById("imgOAuthCode").src = "images/empty.png";
     document.getElementById("imgOAuthCode").alt = "Pending...";
@@ -233,7 +233,7 @@ function updateOAuthCode(value) {
 function updateAccessToken(value) {
   accessToken = value;
   localStorage["accessToken"] = accessToken;
-  
+
   if(value === "") {
     document.getElementById("imgAccessToken").src = "images/empty.png";
     document.getElementById("imgAccessToken").alt = "Pending...";
@@ -252,7 +252,7 @@ function updateAccessToken(value) {
 function updateRefreshToken(value) {
   refreshToken = value;
   localStorage["refreshToken"] = refreshToken;
-  
+
   if(value === "") {
     document.getElementById("imgRefreshToken").src = "images/empty.png";
     document.getElementById("imgRefreshToken").alt = "Pending...";
@@ -271,7 +271,7 @@ function updateRefreshToken(value) {
 function updateSignedIn(value) {
   isSignedIn = value;
   localStorage["isSignedIn"] = isSignedIn;
-  
+
   if (isSignedIn) {
     document.getElementById("btnSignIn").innerText = "Sign Out";
   }
@@ -407,6 +407,36 @@ function hideDeviceControls() {
   document.getElementById("doorbell-webrtc-control").setAttribute("hidden", true);
 }
 
+function updateAnalytics() {
+  // Initialize webRtc => setLocalDescription success (page launch)
+  let analyticsInitialized= "-";
+  if (timestampSetLocalDescriptionSuccess != undefined && timestampInitializeWebRTC != undefined) {
+    analyticsInitialized = timestampSetLocalDescriptionSuccess - timestampInitializeWebRTC + "ms";
+  }
+
+  // Send SDP Offer (generate stream) => Receive SDP Answer (generate stream response)
+  let analyticsAnswerReceived = "-";
+  if (timestampGenerateStreamResponse != undefined && timestampGenerateWebRtcStreamRequest != undefined) {
+    analyticsAnswerReceived = timestampGenerateStreamResponse - timestampGenerateWebRtcStreamRequest + "ms";
+  }
+
+  // Receive SDP Answer (generate stream response) => Connected
+  let analyticsConnected= "-";
+  if (timestampConnected != undefined && timestampGenerateStreamResponse != undefined) {
+    analyticsConnected = timestampConnected - timestampGenerateStreamResponse + "ms";
+  }
+
+  // Connected => Playback Started
+  let analyticsPlaybackStarted = "-";
+  if (timestampPlaybackStarted != undefined && timestampConnected != undefined) {
+    analyticsPlaybackStarted = timestampPlaybackStarted - timestampConnected + "ms";
+  }
+
+  document.getElementById("analyticsInitialized").innerHTML = analyticsInitialized;
+  document.getElementById("analyticsAnswerReceived").innerHTML = analyticsAnswerReceived;
+  document.getElementById("analyticsConnected").innerHTML = analyticsConnected;
+  document.getElementById("analyticsPlaybackStarted").innerHTML = analyticsPlaybackStarted;
+}
 
 
 /// Logging Functions ///
@@ -416,7 +446,7 @@ function showLogEntry(index){
   let logText = document.getElementById("log-text");
   let logTime = document.getElementById("log-time");
   let logType = document.getElementById("log-type");
-  
+
   logTitle.textContent = filteredLogs[index].title;
   logText.textContent = filteredLogs[index].text;
   logTime.textContent = filteredLogs[index].time;

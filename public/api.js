@@ -1,5 +1,5 @@
 
-/* Copyright 2020 Google LLC
+/* Copyright 2022 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -129,7 +129,9 @@ function deviceAccessResponse(method, call, response) {
       console.log("List Structures!");
       break;
     case 'generateStream':
-      console.log("Generate Stream!");
+      timestampGenerateStreamResponse = new Date();
+      updateAnalytics();
+      console.log(`Generate Stream response - `, timestampGenerateStreamResponse);
       if(data["results"] && (data["results"].hasOwnProperty("streamExtensionToken") || data["results"].hasOwnProperty("mediaSessionId")))
         updateStreamExtensionToken(data["results"].streamExtensionToken || data["results"].mediaSessionId);
       if(data["results"] && data["results"].hasOwnProperty("answerSdp")) {
@@ -138,12 +140,16 @@ function deviceAccessResponse(method, call, response) {
       }
       break;
     case 'refreshStream':
-      console.log("Refresh Stream!");
+      timestampExtendStreamResponse = new Date();
+      updateAnalytics();
+      console.log(`Refresh Stream response - `, timestampExtendStreamResponse);
       if(data["results"] && (data["results"].hasOwnProperty("streamExtensionToken") || data["results"].hasOwnProperty("mediaSessionId")))
         updateStreamExtensionToken(data["results"].streamExtensionToken || data["results"].mediaSessionId);
       break;
     case 'stopStream':
-      console.log("Stop Stream!");
+      timestampStopStreamResponse = new Date();
+      updateAnalytics();
+      console.log(`Stop Stream response - `, timestampStopStreamResponse);
       initializeWebRTC();
       break;
     case 'fanMode':
@@ -263,6 +269,11 @@ function onTemperatureSetpoint() {
 
 /** onGenerateStream - Issues a GenerateRtspStream request */
 function onGenerateStream() {
+  clearAnalytics(true);
+  timestampGenerateStreamRequest = new Date();
+  updateAnalytics();
+  console.log(`onGenerateStream() - `, timestampGenerateStreamRequest);
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.GenerateRtspStream"
@@ -272,6 +283,10 @@ function onGenerateStream() {
 
 /** onExtendStream - Issues a ExtendRtspStream request */
 function onExtendStream() {
+  timestampExtendStreamRequest = new Date();
+  updateAnalytics();
+  console.log(`onExtendStream() - `, timestampExtendStreamRequest);
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.ExtendRtspStream",
@@ -284,6 +299,10 @@ function onExtendStream() {
 
 /** onStopStream - Issues a StopRtspStream request */
 function onStopStream() {
+  timestampStopStreamRequest = new Date();
+  updateAnalytics();
+  console.log(`onStopStream() - `, timestampStopStreamRequest);
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.StopRtspStream",
@@ -296,6 +315,11 @@ function onStopStream() {
 
 /** onGenerateStream_WebRTC - Issues a GenerateWebRtcStream request */
 function onGenerateStream_WebRTC() {
+  clearAnalytics(true);
+  timestampGenerateWebRtcStreamRequest = new Date();
+  updateAnalytics();
+  console.log(`onGenerateStream_WebRTC() - `, timestampGenerateWebRtcStreamRequest);
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.GenerateWebRtcStream",
@@ -309,6 +333,10 @@ function onGenerateStream_WebRTC() {
 
 /** onExtendStream_WebRTC - Issues a ExtendWebRtcStream request */
 function onExtendStream_WebRTC() {
+  timestampExtendWebRtcStreamRequest = new Date();
+  updateAnalytics();
+  console.log(`onExtendStream_WebRTC() - `, timestampExtendWebRtcStreamRequest);
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.ExtendWebRtcStream",
@@ -321,6 +349,10 @@ function onExtendStream_WebRTC() {
 
 /** onStopStream_WebRTC - Issues a StopWebRtcStream request */
 function onStopStream_WebRTC() {
+  timestampStopWebRtcStreamRequest = new Date();
+  updateAnalytics();
+  console.log(`onStopStream_WebRTC() - `, timestampStopWebRtcStreamRequest);
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + selectedDevice.id + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.StopWebRtcStream",

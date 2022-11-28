@@ -9,7 +9,7 @@ body {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: 50px 360px auto;
+  grid-template-rows: 50px 360px 136px auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   width: 100%;
@@ -39,6 +39,11 @@ body {
   align-items: center;
 }
 
+.item-analytics {
+  grid-column: 1 / span 3;
+  align-items: center;
+}
+
 .item-device-access {
   height: 120px;
 }
@@ -49,11 +54,10 @@ body {
 }
 
 .item-device-control {
-  height: 360px;
 }
 
 .item-log-list {
-
+  grid-column: 1;
 }
 
 .item-log-description {
@@ -160,7 +164,6 @@ body {
 }
 
 .log-header {
-  /*background-color: #FF0000;*/
   display: grid;
   grid-template-columns: auto auto min-content min-content;
   border-bottom: 1px solid #AAAAAA;
@@ -169,7 +172,6 @@ body {
 }
 
 .log-title {
-  /*background-color: #00AA00;*/
   color: #666666;
   margin-left: 25px;
 }
@@ -199,9 +201,7 @@ body {
   font-size: .75rem;
   font-weight: 500;
   text-transform: uppercase;
-  /*border: 1px solid #666666;*/
   border-radius: 4px;
-  /*background-color: #EFEFEF;*/
   height: 22px;
   padding: 0px 15px;
   margin: 0px;
@@ -353,7 +353,6 @@ button {
   font-size: .75rem;
   font-weight: 500;
   text-transform: uppercase;
-  /*height: 28px;*/
 }
 
 button:focus {
@@ -386,7 +385,7 @@ select {
   border: none;
   height: 20px;
   width: 55%;
-  
+
   text-align-last: center;
   -ms-text-align-last: center;
   -moz-text-align-last: center;
@@ -431,4 +430,47 @@ video {
   border-radius: 4px;
   background-color: #888888;
   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+#analyticsTable {
+  text-align: center;
+  border-spacing:0 0px;
+  margin-bottom: 10px;
+}
+
+#analyticsTable td {
+  width: 25%;
+  padding: 0px;
+  margin: 0px;
+}
+
+#analyticsTable p {
+  margin: 0px;
+}
+
+.analytics-row-label {
+  border-radius: 6px 6px 0px 0px;
+  background-color: #EFEFEF;
+  width: 200px;
+  display: inline-table;
+  border-bottom: 1px solid #AAAAAA;
+}
+
+.analytics-row-label p {
+  padding-top: 5px;
+}
+
+.analytics-row-value {
+  border-radius: 0px 0px 6px 6px;
+  background-color: #EFEFEF;
+  width: 200px;
+  display: inline-table;
+}
+
+.analytics-row-value p {
+  padding: 5px 0px 5px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 200px;
+  text-overflow: ellipsis;
 }
