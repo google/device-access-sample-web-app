@@ -94,7 +94,6 @@ function signOut() {
   updateSignedIn(false);
 }
 
-
 /** handleAuth - Detects and sends oauth response code to server */
 function handleAuth () {
   return new Promise(function (resolve, reject) {
@@ -127,7 +126,6 @@ function handleAuth () {
     resolve();
   });
 }
-
 
 /** exchangeCode - Exchanges OAuth Code to OAuth Tokens */
 function exchangeCode() {

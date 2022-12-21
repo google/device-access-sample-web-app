@@ -16,7 +16,6 @@ limitations under the License.
 
 
 // WebRTC Variables:
-
 let localPeerConnection;
 let localSendChannel;
 let localStream;
@@ -27,7 +26,6 @@ let videoElement;
 
 
 // WebRTC Configurations:
-
 const localOfferOptions = {
   offerToReceiveVideo: 1,
   offerToReceiveAudio: 1,
@@ -38,7 +36,8 @@ const mediaStreamConstraints = {
   video: false,
 };
 
-// WebRTC Analytics:
+
+/// WebRTC Analytics ///
 
 // Page launch
 let timestampInitializeWebRTC;
@@ -62,6 +61,7 @@ let timestampSetRemoteDescription;
 let timestampSetRemoteDescriptionSuccess;
 let timestampConnected;
 let timestampPlaybackStarted;
+
 
 /// WebRTC Functions ///
 
@@ -150,7 +150,6 @@ function updateWebRTC(answerSDP) {
         setRemoteDescriptionSuccess(localPeerConnection);
       }).catch(setSessionDescriptionError);
 }
-
 
 
 /// Helper Functions ///

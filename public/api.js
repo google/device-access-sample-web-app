@@ -49,7 +49,6 @@ function deviceAccessRequest(method, call, localpath, payload = "") {
   }
 }
 
-
 /** deviceAccessResponse - Parses responses from Device Access API calls */
 function deviceAccessResponse(method, call, response) {
   pushLog(LogType.HTTP, method + " Response", response);
@@ -173,7 +172,6 @@ function deviceAccessResponse(method, call, response) {
 function openResourcePicker() {
   window.open(selectedResourcePicker);
 }
-
 
 
 /// Device Access API ///

@@ -56,6 +56,7 @@ class Log {
   }
 }
 
+
 /** pushLog - Pushes a new log to the list */
 function pushLog(type, title, text, status = LogStatus.INFO) {
   const newLog = new Log(type, title, text, status);
